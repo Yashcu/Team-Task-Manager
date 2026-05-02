@@ -1,18 +1,25 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
-dotenv.config();
+import authRoutes from './routes/auth.routes.js';
+import { env } from './lib/env.js';
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: env.FRONTEND_URL,
+    credentials: true,
+}));
 app.use(express.json());
+app.use(cookieParser());
 
-// Health route
+// Hello route
 app.get('/hello', (_, res) => {
     res.json({ message: 'hello from backend' });
 });
+
+app.use('/api/auth', authRoutes);
 
 export default app;
