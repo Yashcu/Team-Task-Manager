@@ -43,12 +43,14 @@ export const useLogin = () => {
 };
 
 export const useLogout = () => {
-    const qc = useQueryClient();
     const navigate = useNavigate();
+    const qc = useQueryClient();
 
-    return async () => {
-        await api.post('/api/auth/logout');
-        qc.clear();
-        navigate('/login');
-    };
+    return useMutation({
+        mutationFn: () => api.post('/api/auth/logout'),
+        onSuccess: () => {
+            qc.clear();
+            navigate('/login');
+        },
+    });
 };

@@ -1,21 +1,17 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { ProjectPage } from './pages/ProjectPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from '@/components/PublicRoute';
-import { LogoutButton } from '@/components/LogoutButton';
+import { Layout } from './components/Layout';
+import { Toaster } from 'sonner';
 
-const Dashboard = () => (
-  <div className="p-6">
-    <header className="flex justify-between items-center mb-8">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <LogoutButton />
-    </header>
-  </div>
-);
 export default function App() {
   return (
-    <div className="min-h-screen bg-muted/40 text-foreground font-sans antialiased">
+    <div className="min-h-screen bg-gray-50 text-foreground font-sans antialiased">
+      <Toaster position="top-right" richColors />
       <BrowserRouter>
         <Routes>
           <Route
@@ -40,7 +36,20 @@ export default function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Layout>
+                  <DashboardPage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/projects/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ProjectPage />
+                </Layout>
               </ProtectedRoute>
             }
           />
