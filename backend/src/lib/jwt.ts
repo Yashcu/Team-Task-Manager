@@ -6,7 +6,6 @@ const SECRET = env.JWT_SECRET;
 
 export interface JwtPayload {
     userId: string;
-    role: 'ADMIN' | 'MEMBER';
 }
 
 export const signToken = (payload: JwtPayload) =>

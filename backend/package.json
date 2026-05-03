@@ -1,19 +1,19 @@
 {
   "name": "task_management_backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Task Management System Backend",
+  "main": "src/server.ts",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "prisma:generate": "prisma generate",
+    "postinstall": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"
   },
   "keywords": [],
-  "author": "",
+  "author": "Yash Garg",
   "license": "ISC",
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

@@ -18,6 +18,6 @@ export const env = {
     NODE_ENV,
     PORT: process.env.PORT || '5000',
     DATABASE_URL: getEnvOrThrow('DATABASE_URL'),
-    JWT_SECRET: getEnvOrThrow('JWT_SECRET', NODE_ENV === 'development' ? 'mysecretkey' : undefined),
+    JWT_SECRET: getEnvOrThrow('JWT_SECRET'),
     FRONTEND_URL: getEnvOrThrow('FRONTEND_URL', 'http://localhost:5173'),
 };
