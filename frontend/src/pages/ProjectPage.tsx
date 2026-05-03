@@ -24,38 +24,6 @@ type ProjectMember = {
     };
 };
 
-type TaskColumn = {
-    status: TaskStatus;
-    title: string;
-    countClassName: string;
-    columnClassName: string;
-    emptyText: string;
-};
-
-const taskColumns: TaskColumn[] = [
-    {
-        status: 'PENDING',
-        title: 'To Do',
-        countClassName: 'bg-slate-100 text-slate-600',
-        columnClassName: 'bg-slate-50/50 border-slate-200/60',
-        emptyText: 'No tasks to do.',
-    },
-    {
-        status: 'IN_PROGRESS',
-        title: 'In Progress',
-        countClassName: 'bg-blue-50 text-blue-600',
-        columnClassName: 'bg-blue-50/30 border-blue-100/60',
-        emptyText: 'Nothing in progress.',
-    },
-    {
-        status: 'COMPLETED',
-        title: 'Completed',
-        countClassName: 'bg-emerald-50 text-emerald-600',
-        columnClassName: 'bg-emerald-50/30 border-emerald-100/60',
-        emptyText: 'No completed tasks yet.',
-    },
-];
-
 export const ProjectPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
