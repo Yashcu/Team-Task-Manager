@@ -1,21 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../lib/jwt.js';
+import { AppError } from '../lib/errors.js';
 
 export const authenticate = (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
 ) => {
-    const token = req.cookies?.token;
-
-    if (!token) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
     try {
+        const token = req.cookies?.token;
+
+        if (!token) throw new AppError('Unauthorized', 401);
+
         req.user = verifyToken(token);
+
         next();
-    } catch {
-        return res.status(401).json({ error: 'Invalid token' });
+    } catch (err) {
+        next(err);
     }
 };

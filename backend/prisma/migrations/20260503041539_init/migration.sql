@@ -1,6 +1,12 @@
 -- CreateEnum
 CREATE TYPE "ProjectRole" AS ENUM ('ADMIN', 'MEMBER');
 
+-- CreateEnum
+CREATE TYPE "TaskStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'COMPLETED');
+
+-- CreateEnum
+CREATE TYPE "TaskPriority" AS ENUM ('LOW', 'MEDIUM', 'HIGH');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -35,6 +41,23 @@ CREATE TABLE "project_members" (
     CONSTRAINT "project_members_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "tasks" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "status" "TaskStatus" NOT NULL DEFAULT 'PENDING',
+    "priority" "TaskPriority" NOT NULL DEFAULT 'MEDIUM',
+    "project_id" TEXT NOT NULL,
+    "assignee_id" TEXT,
+    "created_by" TEXT NOT NULL,
+    "due_date" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "tasks_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
@@ -47,6 +70,12 @@ CREATE INDEX "project_members_user_id_idx" ON "project_members"("user_id");
 -- CreateIndex
 CREATE UNIQUE INDEX "project_members_project_id_user_id_key" ON "project_members"("project_id", "user_id");
 
+-- CreateIndex
+CREATE INDEX "tasks_project_id_idx" ON "tasks"("project_id");
+
+-- CreateIndex
+CREATE INDEX "tasks_assignee_id_idx" ON "tasks"("assignee_id");
+
 -- AddForeignKey
 ALTER TABLE "projects" ADD CONSTRAINT "projects_owner_id_fkey" FOREIGN KEY ("owner_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -55,3 +84,12 @@ ALTER TABLE "project_members" ADD CONSTRAINT "project_members_project_id_fkey" F
 
 -- AddForeignKey
 ALTER TABLE "project_members" ADD CONSTRAINT "project_members_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_assignee_id_fkey" FOREIGN KEY ("assignee_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tasks" ADD CONSTRAINT "tasks_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

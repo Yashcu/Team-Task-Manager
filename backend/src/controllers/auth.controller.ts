@@ -1,76 +1,83 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { signToken } from '../lib/jwt.js';
-import { findUserByEmail, findUserById, createUser, validatePassword } from '../services/auth.service.js';
+import {
+    findUserByEmail,
+    findUserById,
+    createUser,
+    validatePassword,
+} from '../services/auth.service.js';
 import { setAuthCookie, clearAuthCookie } from '../lib/cookie.js';
+import { AppError } from '../lib/errors.js';
 
-export const signup = async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
+export const signup = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { name, email, password } = req.body;
 
-    const existing = await findUserByEmail(email);
-    if (existing) {
-        return res.status(409).json({ error: 'Email already exists' });
+        const existing = await findUserByEmail(email);
+        if (existing) throw new AppError('Email already exists', 409);
+
+        const user = await createUser(name, email, password);
+
+        const token = signToken({ userId: user.id });
+        setAuthCookie(res, token);
+
+        return res.status(201).json({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            },
+        });
+    } catch (err) {
+        next(err);
     }
+};
 
-    const user = await createUser(name, email, password);
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { email, password } = req.body;
 
-    const token = signToken({
-        userId: user.id,
-    });
+        const user = await findUserByEmail(email);
+        if (!user) throw new AppError('Invalid credentials', 401);
 
-    setAuthCookie(res, token);
+        const isValid = await validatePassword(password, user.passwordHash);
+        if (!isValid) throw new AppError('Invalid credentials', 401);
 
-    return res.status(201).json({
-        user: {
+        const token = signToken({ userId: user.id });
+        setAuthCookie(res, token);
+
+        return res.json({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+            },
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getMe = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await findUserById(req.user!.userId);
+        if (!user) throw new AppError('User not found', 404);
+
+        return res.json({
             id: user.id,
             name: user.name,
             email: user.email,
-        },
-    });
+        });
+    } catch (err) {
+        next(err);
+    }
 };
 
-export const login = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-
-    const user = await findUserByEmail(email);
-    if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+export const logout = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+        clearAuthCookie(res);
+        return res.json({ message: 'Logged out' });
+    } catch (err) {
+        next(err);
     }
-
-    const isValid = await validatePassword(password, user.passwordHash);
-    if (!isValid) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const token = signToken({
-        userId: user.id,
-    });
-
-    setAuthCookie(res, token);
-
-    return res.json({
-        user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-        },
-    });
-};
-
-export const getMe = async (req: Request, res: Response) => {
-    const user = await findUserById(req.user!.userId);
-
-    if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-    }
-
-    return res.json({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-    });
-};
-
-export const logout = (_req: Request, res: Response) => {
-    clearAuthCookie(res);
-    return res.json({ message: 'Logged out' });
 };
