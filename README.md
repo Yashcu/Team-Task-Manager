@@ -2,8 +2,6 @@
 
 A full-stack task management system built for teams. Admins create projects, invite members, and assign tasks. Members pick up their work and move it forward. That's it — simple by design, solid under the hood.
 
-**Live:** [Frontend](https://your-frontend.vercel.app) · [Backend API](https://your-backend.onrender.com)
-
 ---
 
 ## Why I Built This
